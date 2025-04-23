@@ -9,13 +9,21 @@ app.use(bodyParser.json());
 app.post('/alexa', async (req, res) => {
   const message =
     req.body.request?.intent?.slots?.message?.value || 'احكي لي شيئًا';
+  console.log('📥 Received message from Alexa:', message);
 
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
         model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: message }],
+        messages: [
+          {
+            role: 'system',
+            content:
+              'أنت مساعد ذكي يتحدث اللغة العربية ويقدم إجابات مفيدة وغنية بالمعلومة.',
+          },
+          { role: 'user', content: message },
+        ],
       },
       {
         headers: {
@@ -28,6 +36,7 @@ app.post('/alexa', async (req, res) => {
     );
 
     const reply = response.data.choices[0].message.content;
+    console.log('✅ ChatGPT Reply:', reply);
 
     res.json({
       version: '1.0',
@@ -40,7 +49,10 @@ app.post('/alexa', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error from OpenAI:', error?.response?.data || error.message);
+    console.error(
+      '❌ Error from OpenAI:',
+      error?.response?.data || error.message
+    );
     res.json({
       version: '1.0',
       response: {
@@ -54,7 +66,5 @@ app.post('/alexa', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) =>
-  res.send('Alexa Skill + ChatGPT with Project-Based Key is working')
-);
-app.listen(PORT, () => console.log(`Running on port ${PORT}`));
+app.get('/', (req, res) => res.send('✅ Alexa Skill + ChatGPT is working'));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
