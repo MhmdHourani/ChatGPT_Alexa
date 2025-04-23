@@ -8,8 +8,7 @@ app.use(bodyParser.json());
 
 app.post('/alexa', async (req, res) => {
   const message =
-    req.body.request.intent.slots.message.value || 'احكي لي شيئًا';
-  console.log('KEY IS: ', process.env.OPENAI_API_KEY);
+    req.body.request?.intent?.slots?.message?.value || 'احكي لي شيئًا';
 
   try {
     const response = await axios.post(
@@ -21,6 +20,8 @@ app.post('/alexa', async (req, res) => {
       {
         headers: {
           Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          'OpenAI-Project': process.env.OPENAI_PROJECT_ID,
+          'OpenAI-Organization': process.env.OPENAI_ORG_ID,
           'Content-Type': 'application/json',
         },
       }
@@ -39,7 +40,7 @@ app.post('/alexa', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error from OpenAI:', error?.response?.data || error.message);
     res.json({
       version: '1.0',
       response: {
@@ -53,5 +54,7 @@ app.post('/alexa', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('Alexa Skill + ChatGPT is working'));
+app.get('/', (req, res) =>
+  res.send('Alexa Skill + ChatGPT with Project-Based Key is working')
+);
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
