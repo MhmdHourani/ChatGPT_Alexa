@@ -7,7 +7,9 @@ const PORT = process.env.PORT || 10000;
 app.use(bodyParser.json());
 
 app.post('/alexa', async (req, res) => {
-  const message = req.body.request.intent.slots.message.value || "احكي لي شيئًا";
+  const message =
+    req.body.request.intent.slots.message.value || 'احكي لي شيئًا';
+  console.log('KEY IS: ', process.env.OPENAI_API_KEY);
 
   try {
     const response = await axios.post(
@@ -18,7 +20,7 @@ app.post('/alexa', async (req, res) => {
       },
       {
         headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
       }
@@ -33,8 +35,8 @@ app.post('/alexa', async (req, res) => {
           type: 'PlainText',
           text: reply,
         },
-        shouldEndSession: false
-      }
+        shouldEndSession: false,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -45,8 +47,8 @@ app.post('/alexa', async (req, res) => {
           type: 'PlainText',
           text: 'حدث خطأ أثناء الاتصال بـ ChatGPT.',
         },
-        shouldEndSession: true
-      }
+        shouldEndSession: true,
+      },
     });
   }
 });
